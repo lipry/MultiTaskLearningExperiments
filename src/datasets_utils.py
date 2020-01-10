@@ -33,7 +33,7 @@ def import_sequences(files_path, file_name):
     check_file_exist(seqences_path)
 
     with open(seqences_path) as f:
-        sequences = [(s.id, s.seq) for s in SeqIO.parse(f, 'fasta')]
+        sequences = [str(s.seq) for s in SeqIO.parse(f, 'fasta')]
 
     return sequences
 
@@ -47,8 +47,10 @@ def import_labels(files_path, file_name):
 
     return labels
 
+
 def import_intersected_labels(files_path):
     return [import_labels(files_path, "{}_labels_intersected.txt".format(line_name)) for line_name in cell_lines]
+
 
 def import_intersected_sequences(files_path):
     sequences = import_sequences(files_path, "sequences_intersected.fa")
@@ -57,7 +59,8 @@ def import_intersected_sequences(files_path):
     assert all(len(sequences) == len(labels_list[i]) for i in range(len(labels_list)))
     assert len(labels_list) == len(cell_lines)
 
-    return sequences, labels_list
+    return np.array(sequences), labels_list
+
 
 def import_intersected_epigenetic(files_path):
     epigenetic_list = [import_epigenetic_data(files_path, "{}_epigenetic_intersected.txt".format(line_name))
@@ -69,4 +72,9 @@ def import_intersected_epigenetic(files_path):
 
     return epigenetic_list, labels_list
 
+
+def filter_labels(X, y, label_A, label_B):
+    conditions = [all(label in [label_A, label_B] for label in elem) for elem in zip(*y)]
+    indices = np.where(conditions)[0]
+    return X[indices], [l[indices] for l in y], len(indices)
 
