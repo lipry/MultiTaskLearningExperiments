@@ -3,12 +3,14 @@ import os
 import numpy as np
 from Bio import SeqIO
 
+from src.data.datasets_helper import sequence2onehot
+
 cell_lines = ["GM12878", "HelaS3", "HepG2", "K562"]
 
-
-def check_cell_line(cell_line):
-    if cell_line not in cell_lines:
-        raise ValueError("Illegal cell line.")
+# TODO: needed?
+#def check_cell_line(cell_line):
+#    if cell_line not in cell_lines:
+#        raise ValueError("Illegal cell line.")
 
 
 def check_file_exist(file_path):
@@ -17,7 +19,6 @@ def check_file_exist(file_path):
 
 
 def import_epigenetic_data(files_path, file_name):
-    #check_cell_line(cell_line)
     epigenetic_data_path = "{}/{}".format(files_path, file_name)
     check_file_exist(epigenetic_data_path)
 
@@ -27,13 +28,11 @@ def import_epigenetic_data(files_path, file_name):
 
 
 def import_sequences(files_path, file_name):
-    #check_cell_line(cell_line)
-
     seqences_path = "{}/{}".format(files_path, file_name)
     check_file_exist(seqences_path)
 
     with open(seqences_path) as f:
-        sequences = [str(s.seq) for s in SeqIO.parse(f, 'fasta')]
+        sequences = [sequence2onehot(str(s.seq)) for s in SeqIO.parse(f, 'fasta')]
 
     return sequences
 
@@ -71,10 +70,4 @@ def import_intersected_epigenetic(files_path):
     assert all(len(epigenetic_list[i]) == len(labels_list[i]) for i in range(len(labels_list)))
 
     return epigenetic_list, labels_list
-
-
-def filter_labels(X, y, label_A, label_B):
-    conditions = [all(label in [label_A, label_B] for label in elem) for elem in zip(*y)]
-    indices = np.where(conditions)[0]
-    return X[indices], [l[indices] for l in y], len(indices)
 
