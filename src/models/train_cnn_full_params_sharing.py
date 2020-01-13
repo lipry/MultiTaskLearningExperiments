@@ -51,7 +51,9 @@ def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val):
     tuner = BayesianOptimization(
         cnn_full_params_sharing_model,
         objective='val_loss',
-        max_trials=10)
+        max_trials=10,
+        directory='tuner_results',
+        project_name='cnn_full_params_sharing')
 
     es = EarlyStopping(monitor='val_loss',
                        patience=10,
