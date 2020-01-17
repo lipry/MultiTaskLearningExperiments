@@ -1,6 +1,30 @@
 data:
   data_path: data/intersected
+  logs_path: logs
 
 execution:
-  gpu: False
-  n_gpu: 4
+  n_gpu: 0
+
+general:
+  n_holdouts: 3
+
+tasks: [['A-E', 'A-P'], ['A-P', 'I-P'], ['A-E', 'I-E'], ['I-E', 'I-P'], ['A-E+A-P', 'BG']]
+# Used only in
+# CNN Full parameters sharing models
+cnn_full_params_sharing:
+  epochs: 5
+  batch_size: 8
+  learning_rate: 0.02
+  beta_1: 0.9
+  beta_2: 0.999
+  bayesian_opt:
+    max_trials: 5
+    patience: 5
+    min_delta: 0.005
+    baseline: 0.2
+    hyperparameters:
+      kernel_size1: [5, 10]
+      kernel_size2: [5, 10]
+      units2: [32, 64]
+      dense1: [32, 64]
+      dense2: [32, 64]

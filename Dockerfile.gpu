@@ -1,0 +1,18 @@
+FROM nvcr.io/nvidia/tensorflow:19.04-py3  as base
+RUN apt-get update
+
+WORKDIR /app
+RUN pip install --upgrade pip
+
+COPY requirements.txt /app/
+
+RUN pip install -r requirements.txt
+
+FROM base as app
+COPY . /app
+
+#FROM app AS Test
+#RUN pytest tests/ -v -s
+
+FROM app AS Develop
+CMD ["python", "main.py"]
