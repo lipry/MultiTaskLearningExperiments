@@ -3,9 +3,10 @@ import os
 import numpy as np
 from Bio import SeqIO
 
+from src.config.config import config
 from src.data.datasets_helper import sequence2onehot
 
-cell_lines = ["GM12878", "HelaS3", "HepG2", "K562"]
+cell_lines = config['general']['cell_lines']
 
 # TODO: needed?
 #def check_cell_line(cell_line):

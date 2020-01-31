@@ -12,6 +12,7 @@ pyyaml = "*"
 keras = "*"
 keras-tuner = "*"
 numpy = "==1.14.*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"

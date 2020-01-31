@@ -3,28 +3,31 @@ data:
   logs_path: logs
 
 execution:
-  n_gpu: 0
+  n_gpu: 4
 
 general:
-  n_holdouts: 3
+  n_holdouts: 10
+  tasks: [['A-E', 'A-P'], ['A-P', 'I-P'], ['A-E', 'I-E'], ['I-E', 'I-P'], ['A-E+A-P', 'BG']]
+  cell_lines: ["GM12878", "HelaS3", "HepG2", "K562"]
 
-tasks: [['A-E', 'A-P'], ['A-P', 'I-P'], ['A-E', 'I-E'], ['I-E', 'I-P'], ['A-E+A-P', 'BG']]
 # Used only in
 # CNN Full parameters sharing models
 cnn_full_params_sharing:
-  epochs: 5
-  batch_size: 8
-  learning_rate: 0.02
+  epochs: 1000
+  batch_size: 100
+  #learning_rate: 0.02
   beta_1: 0.9
   beta_2: 0.999
   bayesian_opt:
-    max_trials: 5
-    patience: 5
-    min_delta: 0.005
+    max_trials: 40
+    num_initial_points: 5
     baseline: 0.2
+    patience: 20
+    min_delta: 0.005
     hyperparameters:
       kernel_size1: [5, 10]
       kernel_size2: [5, 10]
       units2: [32, 64]
       dense1: [32, 64]
       dense2: [32, 64]
+      learning_rate: [0.0, 0.2]
