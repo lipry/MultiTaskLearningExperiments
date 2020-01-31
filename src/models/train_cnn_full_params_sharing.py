@@ -1,5 +1,5 @@
-from tensorflow.keras import Input, Model
 from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras import Input, Model
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
 from tensorflow.keras.optimizers import Nadam
 from tensorflow.keras.utils import multi_gpu_model
@@ -18,6 +18,8 @@ def cnn_full_params_sharing_model(hp):
         config_cnn = config['cnn_full_params_sharing']
         config_cnn_hp = config['cnn_full_params_sharing']['bayesian_opt']['hyperparameters']
         # hyper-parameters grid preparation
+        learning_rate = hp.Float('learning_rate', min_value=config_cnn_hp['learning_rate'][0],
+                                 max_value=config_cnn_hp['learning_rate'][1])
         kernel_size1 = hp.Choice('kernel_size1', values=config_cnn_hp['kernel_size1'])
         kernel_size2 = hp.Choice('kernel_size2', values=config_cnn_hp['kernel_size2'])
         units2 = hp.Choice('units2', values=config_cnn_hp['units2'])
@@ -40,51 +42,65 @@ def cnn_full_params_sharing_model(hp):
         x = Dense(dense2, activation='relu')(x)
         x = Dropout(0.1)(x)
 
-        predictions1 = Dense(1, activation='sigmoid')(x)
-        predictions2 = Dense(1, activation='sigmoid')(x)
-        predictions3 = Dense(1, activation='sigmoid')(x)
-        predictions4 = Dense(1, activation='sigmoid')(x)
+        predictions1 = Dense(1, activation='sigmoid', name="pred0")(x)
+        predictions2 = Dense(1, activation='sigmoid', name="pred1")(x)
+        predictions3 = Dense(1, activation='sigmoid', name="pred2")(x)
+        predictions4 = Dense(1, activation='sigmoid', name="pred3")(x)
 
         cnn_model = Model(inputs, [predictions1, predictions2, predictions3, predictions4])
     if config['execution']['n_gpu'] > 1:
         cnn_model = multi_gpu_model(cnn_model, gpus=config['execution']['n_gpu'])
 
-    nadam_opt = Nadam(lr=config_cnn['learning_rate'],
+    nadam_opt = Nadam(lr=learning_rate,
                       beta_1=config_cnn['beta_1'],
                       beta_2=config_cnn['beta_2'])
-    cnn_model.compile(loss=['binary_crossentropy']*4,
+
+    cnn_model.compile(loss={'pred0': 'binary_crossentropy', 'pred1': 'binary_crossentropy',
+                            'pred2': 'binary_crossentropy', 'pred3': 'binary_crossentropy'},
                        optimizer=nadam_opt,
                        metrics=[auprc, auroc])
 
     return cnn_model
 
 
-# TODO: Do some test
-def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val):
-    config_cnn_bayesian = config['cnn_full_params_sharing']['bayesian_opt']
+def get_batch_size():
     n_gpu = config['execution']['n_gpu']
     batch_size = config['cnn_full_params_sharing']['batch_size']
-    batch_size_total = n_gpu * batch_size if n_gpu > 0 else batch_size
+    return n_gpu * batch_size if n_gpu > 0 else batch_size
+
+# TODO: Do some test
+def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val, n_best_models=1):
+    config_cnn_bayesian = config['cnn_full_params_sharing']['bayesian_opt']
+    batch_size_total = get_batch_size()
 
     tuner = BayesianOptimization(
         cnn_full_params_sharing_model,
-        objective='val_loss', # TODO: binary_crossentropy
+        objective='val_loss', # TODO: binary_crossentropy, put in config?
         max_trials=config_cnn_bayesian['max_trials'],
+        num_initial_points=config_cnn_bayesian['num_initial_points'],
         directory='tuner_results',
         project_name='cnn_full_params_sharing')
+
+    es = EarlyStopping(monitor='val_loss', patience=config_cnn_bayesian['patience'],
+                       min_delta=config_cnn_bayesian['min_delta'])
 
     tuner.search(X_train, y_train,
                  epochs=config['cnn_full_params_sharing']['epochs'],
                  batch_size=batch_size_total,
+                 callbacks=[es],
                  validation_data=(X_val, y_val))
 
-    return tuner.get_best_models(num_models=1)[0]
+    return tuner, tuner.get_best_models(num_models=n_best_models), tuner.get_best_hyperparameters(num_trials=n_best_models)
 
 
-#def evaluate_model()
+def train_cnn_full_params_sharing(X_train, y_train, X_val, y_val, training_hp):
+    batch_size_total = get_batch_size()
 
-#def train_cnn_full_params_sharing(model, X_test, y_test):
-#    model.fit(X_train, y_train,
-#                 epochs=1000,
-#                 callbacks=[es],
-#                 validation_data=(X_val, y_val))
+    model = cnn_full_params_sharing_model(training_hp)
+
+    history = model.fit(X_train, y_train,
+             epochs=config['cnn_full_params_sharing']['epochs'],
+             batch_size=batch_size_total,
+             validation_data=(X_val, y_val))
+
+    return model, history
