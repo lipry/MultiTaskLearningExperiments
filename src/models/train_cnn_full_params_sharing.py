@@ -10,7 +10,7 @@ from src.config.config import config
 from src.metrics.metrics import auprc, auroc
 
 
-# TODO: make hyperparameter search space in config
+
 def cnn_full_params_sharing_model(hp):
     with tf.device("/cpu:0"):
         inputs = Input(shape=(200,5))

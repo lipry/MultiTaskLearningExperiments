@@ -43,7 +43,7 @@ def au_plot(training, test, metric, path, exp_name, task, cell_lines=["GM12878",
     plt.savefig("{}/{}_{}_{}_{}".format(path, time.strftime("%Y%m%d-%H%M%S"), exp_name, metric, task))
 
 
-def evaluation_performance_plot(results, std_dev, title, path, exp_name, metric, task):
+def evaluation_performance_plot(results, std_dev, title, path, exp_name, metric):
     bar_width = 0.12
     plt.figure(figsize=(16, 10))
 
@@ -69,4 +69,4 @@ def evaluation_performance_plot(results, std_dev, title, path, exp_name, metric,
 
     # Create legend & show graphic
     plt.legend(loc='lower left', prop={'size': 10})
-    plt.savefig("{}/{}_{}_{}_{}".format(path, time.strftime("%Y%m%d-%H%M%S"), exp_name, metric, task))
+    plt.savefig("{}/{}_{}_{}".format(path, time.strftime("%Y%m%d-%H%M%S"), exp_name, metric))

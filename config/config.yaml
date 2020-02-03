@@ -6,6 +6,9 @@ execution:
   n_gpu: 4
 
 general:
+  # fps: full parameter sharing,
+  # stats: to get some statistics about datasets
+  experiment: "fps"
   n_holdouts: 10
   tasks: [['A-E', 'A-P'], ['A-P', 'I-P'], ['A-E', 'I-E'], ['I-E', 'I-P'], ['A-E+A-P', 'BG']]
   cell_lines: ["GM12878", "HelaS3", "HepG2", "K562"]
@@ -31,3 +34,4 @@ cnn_full_params_sharing:
       dense1: [32, 64]
       dense2: [32, 64]
       learning_rate: [0.0, 0.2]
+
