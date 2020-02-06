@@ -29,7 +29,7 @@ def fps_executor(X, y, logger, path_logs):
         if t[1] == 'BG':
             y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
 
-        X_filtered, y_filtered = filter_labels(X, y, t[0], t[1])
+        X_filtered, y_filtered = filter_labels(X, y, t[0], t[1], logger)
 
         results.init_metrics()
         for h in range(holdouts):

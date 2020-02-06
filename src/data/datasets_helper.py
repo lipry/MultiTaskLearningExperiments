@@ -13,21 +13,22 @@ def sequence2onehot(sequence):
     return np.array([ltrdict[x] for x in sequence.lower()])
 
 
-def encoding_labels(y):
+def encoding_labels(y, logger):
     encoder = LabelEncoder()
     encoder.fit(y)
     y = encoder.transform(y)
+    mapping = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
+    logger.debug("Encoded map: {}".format(mapping))
     return y
-
 
 def group_labels(y, labels, group_name):
     return [np.array([group_name if elem in labels else elem for elem in l]) for l in y]
 
 
-def filter_labels(X, y, label_a, label_b):
+def filter_labels(X, y, label_a, label_b, logger):
     conditions = [all(label in [label_a, label_b] for label in elem) for elem in zip(*y)]
     indices = np.where(conditions)[0]
-    return X[indices], [encoding_labels(l[indices]) for l in y]
+    return X[indices], [encoding_labels(l[indices], logger) for l in y]
 
 
 def split_datasets(X, y, perc=0.3):
