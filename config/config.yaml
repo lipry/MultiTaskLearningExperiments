@@ -8,7 +8,7 @@ execution:
 general:
   # fps: full parameter sharing,
   # stats: to get some statistics about datasets
-  experiment: "fps"
+  experiment: "stats"
   n_holdouts: 10
   tasks: [['A-E', 'A-P'], ['A-P', 'I-P'], ['A-E', 'I-E'], ['I-E', 'I-P'], ['A-E+A-P', 'BG']]
   cell_lines: ["GM12878", "HelaS3", "HepG2", "K562"]

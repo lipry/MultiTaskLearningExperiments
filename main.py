@@ -12,7 +12,7 @@ files_path = config['data']['data_path']
 logs_path = config['data']['logs_path']
 exp = config['general']['experiment']
 
-path_logs = "{}/{}_fps_experiment".format(logs_path, time.strftime("%Y%m%d-%H%M%S"))
+path_logs = "{}/{}_{}_experiment".format(logs_path, time.strftime("%Y%m%d-%H%M%S"), exp)
 if not os.path.exists(path_logs):
     os.makedirs(path_logs)
 
