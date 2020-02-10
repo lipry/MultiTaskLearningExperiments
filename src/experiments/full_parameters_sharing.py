@@ -1,4 +1,5 @@
 from src.config.config import config
+from src.config.config_utils import get_task_labels
 from src.data.datasets_helper import group_labels, filter_labels, split_datasets
 from src.models.train_cnn_full_params_sharing import hp_tuning_cnn_full_params_sharing, train_cnn_full_params_sharing
 from src.visualizations.ResultsCollector import ResultsCollector
@@ -8,28 +9,30 @@ from src.visualizations.results_plotting import train_val_loss_plot, au_plot, ev
 
 def fps_executor(X, y, logger, path_logs):
     holdouts = config['general']['n_holdouts']
-    tasks = config['general']['tasks']
+    tasks_dict = config['general']['tasks']
 
     results = ResultsCollector()
     results.init_eval_metrics()
-    for t in tasks:
-        task_name = "{}vs{}".format(t[0], t[1])
+    for t in tasks_dict:
+        t_labels = get_task_labels(t)
+        task_name = "{}vs{}".format(t_labels[0], t_labels[1])
+
         logger.debug("NEW EXPERIMENT: {}".format(task_name))
         # TODO: put in some general function
         # Grouping particular labels for some tasks
-        if t[0] == 'A-E+A-P':
+        if t_labels[0] == 'A-E+A-P':
             y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
 
-        if t[0] == 'BG':
+        if t_labels[0] == 'BG':
             y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
 
-        if t[1] == 'A-E+A-P':
+        if t_labels[1] == 'A-E+A-P':
             y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
 
-        if t[1] == 'BG':
+        if t_labels[1] == 'BG':
             y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
 
-        X_filtered, y_filtered = filter_labels(X, y, t[0], t[1], logger)
+        X_filtered, y_filtered = filter_labels(X, y, t_labels[0], t_labels[1], t)
 
         results.init_metrics()
         for h in range(holdouts):

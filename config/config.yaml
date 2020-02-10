@@ -10,8 +10,8 @@ general:
   # stats: to get some statistics about datasets
   experiment: "stats"
   n_holdouts: 10
-  tasks: [['A-E', 'A-P'], ['A-P', 'I-P'], ['A-E', 'I-E'], ['I-E', 'I-P'], ['A-E+A-P', 'BG']]
   cell_lines: ["GM12878", "HelaS3", "HepG2", "K562"]
+  tasks: [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
 
 # Used only in
 # CNN Full parameters sharing models
