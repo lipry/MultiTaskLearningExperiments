@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 def train_val_loss_plot(training_data, validation_data, title, path, exp_name, task):
     # Draw Plot
     plt.figure(figsize=(16,10), dpi= 80)
-    plt.plot(training_data, color='tab:red')
-    plt.plot(validation_data, color='tab:blue')
+    plt.plot(training_data, color='tab:red', label="Training loss")
+    plt.plot(validation_data, color='tab:blue', label="Validation loss")
 
     # Decoration
     plt.yticks(fontsize=12, alpha=.7)
@@ -21,6 +21,7 @@ def train_val_loss_plot(training_data, validation_data, title, path, exp_name, t
     plt.gca().spines["bottom"].set_alpha(0.3)
     plt.gca().spines["right"].set_alpha(0.0)
     plt.gca().spines["left"].set_alpha(0.3)
+    plt.legend(loc='upper left', prop={'size': 15})
     plt.savefig("{}/{}_{}_loss_{}".format(path, time.strftime("%Y%m%d-%H%M%S"), exp_name, task))
 
 
