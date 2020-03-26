@@ -59,7 +59,7 @@ def import_intersected_sequences(files_path):
     assert all(len(sequences) == len(labels_list[i]) for i in range(len(labels_list)))
     assert len(labels_list) == len(cell_lines)
 
-    return np.array(sequences), labels_list
+    return [np.array(sequences)], labels_list
 
 
 def import_intersected_epigenetic(files_path):
@@ -71,4 +71,10 @@ def import_intersected_epigenetic(files_path):
     assert all(len(epigenetic_list[i]) == len(labels_list[i]) for i in range(len(labels_list)))
 
     return epigenetic_list, labels_list
+
+
+def input_data(files_path, input_type):
+    d = {'epi': import_intersected_epigenetic, 'seq': import_intersected_sequences}
+    return d[input_type](files_path)
+
 

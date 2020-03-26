@@ -5,11 +5,8 @@ from tensorflow.keras.optimizers import Nadam
 from tensorflow.keras.utils import multi_gpu_model
 import tensorflow as tf
 from kerastuner import BayesianOptimization
-
 from src.config.config import config
 from src.metrics.metrics import auprc, auroc
-
-
 
 def cnn_full_params_sharing_model(hp):
     with tf.device("/cpu:0"):
@@ -17,6 +14,7 @@ def cnn_full_params_sharing_model(hp):
 
         config_cnn = config['cnn_full_params_sharing']
         config_cnn_hp = config['cnn_full_params_sharing']['bayesian_opt']['hyperparameters']
+
         # hyper-parameters grid preparation
         learning_rate = hp.Float('learning_rate', min_value=config_cnn_hp['learning_rate'][0],
                                  max_value=config_cnn_hp['learning_rate'][1])
@@ -68,8 +66,18 @@ def get_batch_size():
     batch_size = config['cnn_full_params_sharing']['batch_size']
     return n_gpu * batch_size if n_gpu > 0 else batch_size
 
-# TODO: Do some test
-def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val, n_best_models=1):
+
+def check_input_type(admitted_input, message):
+    if config['general']['input_type'] not in admitted_input:
+        raise ValueError(message)
+
+
+def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val, class_weight, n_best_models=1):
+    check_input_type(['seq'], "Cnn full parameter sharing models work just with sequence data, {} found"
+                     .format(config['general']['input_type']))
+
+    print(X_train, y_train, X_val, y_val)
+
     config_cnn_bayesian = config['cnn_full_params_sharing']['bayesian_opt']
     batch_size_total = get_batch_size()
 
@@ -88,18 +96,21 @@ def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val, n_best_mod
                  epochs=config['cnn_full_params_sharing']['epochs'],
                  batch_size=batch_size_total,
                  callbacks=[es],
+                 class_weight=class_weight,
                  validation_data=(X_val, y_val))
 
     return tuner, tuner.get_best_models(num_models=n_best_models), tuner.get_best_hyperparameters(num_trials=n_best_models)
 
 
-def train_cnn_full_params_sharing(X_train, y_train, X_val, y_val, training_hp):
+def train_cnn_full_params_sharing(X_train, y_train, X_val, y_val, class_weight, training_hp):
+    check_input_type(['seq'], "Cnn full parameter sharing models work just with sequence data, {} found"
+                     .format(config['general']['input_type']))
+
     batch_size_total = get_batch_size()
-
     model = cnn_full_params_sharing_model(training_hp)
-
     history = model.fit(X_train, y_train,
              epochs=config['cnn_full_params_sharing']['epochs'],
+             class_weight=class_weight,
              batch_size=batch_size_total,
              validation_data=(X_val, y_val))
 

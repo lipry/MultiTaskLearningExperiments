@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.utils import class_weight
+
 
 def sequence2onehot(sequence):
     # TODO: speedup
@@ -24,15 +26,21 @@ def group_labels(y, labels, group_name):
 def filter_labels(X, y, label_a, label_b, t):
     conditions = [all(label in [label_a, label_b] for label in elem) for elem in zip(*y)]
     indices = np.where(conditions)[0]
-    return X[indices], [encoding_labels(l[indices], t) for l in y]
+    return [x[indices] for x in X], [encoding_labels(l[indices], t) for l in y]
+
+
+def calculate_class_weights(labels):
+    get_weights = lambda y: class_weight.compute_class_weight('balanced', np.unique(y), y)
+    return [get_weights(lab) for lab in labels]
 
 
 def split_datasets(X, y, perc=0.3):
-    assert all([len(l) == len(X) for l in y])
+    assert all([len(l) == len(x) for x, l in zip(X, y)])
 
-    indices = range(len(X))
+    indices = range(len(X[0]))
     indices_train, indices_test = train_test_split(indices, test_size=perc, random_state=None) # random_state generate randomly
 
     # X_train, y_train, X_test, y_test
-    return X[indices_train], [l[indices_train] for l in y], X[indices_test], [l[indices_test] for l in y]
+    return [x[indices_train] for x in X], [l[indices_train] for l in y], \
+           [x[indices_test] for x in X], [l[indices_test] for l in y]
 

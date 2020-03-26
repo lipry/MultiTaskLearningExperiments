@@ -2,8 +2,8 @@ import logging
 import time
 import os
 from src.config.config import config
-from src.data.datasets_import import import_intersected_sequences
-from src.experiments.full_parameters_sharing import fps_executor
+from src.data.datasets_import import import_intersected_sequences, input_data
+from src.experiments.cnn_full_parameters_sharing import cnn_fps_executor
 from src.experiments.statistics import statistics_executor
 
 
@@ -30,10 +30,12 @@ logger.addHandler(f_handler)
 logger.setLevel(logging.DEBUG)
 
 logger.debug("Importing data...")
-X, y = import_intersected_sequences(files_path)
+
+
+X, y = input_data(files_path, input_type=config['general']['input_type'])
 
 if exp == "fps":
-    fps_executor(X, y, logger, path_logs)
+    cnn_fps_executor(X, y, logger, path_logs)
 
 if exp == "stats":
     statistics_executor(X, y, logger, path_logs)

@@ -9,6 +9,10 @@ general:
   # fps: full parameter sharing,
   # stats: to get some statistics about datasets
   experiment: "stats"
+  # epi: for epigenetic features as input
+  # seq: for sequences as input
+  # both: to be implemented (for sequence and epigenetic features together as input)
+  input_type: "seq"
   n_holdouts: 10
   cell_lines: ["GM12878", "HelaS3", "HepG2", "K562"]
   tasks: [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
@@ -17,7 +21,7 @@ general:
 # CNN Full parameters sharing models
 cnn_full_params_sharing:
   epochs: 1000
-  batch_size: 100
+  batch_size: 100 #da aumentare
   #learning_rate: 0.02
   beta_1: 0.9
   beta_2: 0.999
