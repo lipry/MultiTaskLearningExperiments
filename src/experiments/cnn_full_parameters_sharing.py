@@ -67,6 +67,7 @@ def cnn_fps_executor(X, y, logger, path_logs):
             results.add_holdout_results(history)
 
             # Evaluating best model performances
+            print(len(X_test[0]), [len(y) for y in y_test])
             eval_score = best_model.evaluate(X_test[0], y_test)
             eval_score = {k: v for k, v in zip(best_model.metrics_names, eval_score)}
 
@@ -81,11 +82,11 @@ def cnn_fps_executor(X, y, logger, path_logs):
 
         # - auprc
         auprc_avg, val_auprc_avg = results.get_auprc_mean()
-        au_plot(auprc_avg, val_auprc_avg, "AUPRC", path_logs, "fps", task_name)
+        au_plot(auprc_avg, val_auprc_avg, "AUPRC", path_logs, "fps", task_name, config['general']['cell_lines'])
 
         # - auroc
         auroc_avg, val_auroc_avg = results.get_auroc_mean()
-        au_plot(auroc_avg, val_auroc_avg, "AUROC", path_logs, "fps", task_name)
+        au_plot(auroc_avg, val_auroc_avg, "AUROC", path_logs, "fps", task_name, config['general']['cell_lines'])
 
         # save metrics at the end of every tasks executions
         results.save_metrics(path_logs, "fps_metrics", task_name)

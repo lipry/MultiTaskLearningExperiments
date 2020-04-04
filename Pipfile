@@ -9,10 +9,11 @@ verify_ssl = true
 biopython = "*"
 tqdm = "*"
 pyyaml = "*"
-keras = "*"
+keras = "<=2.3.0"
 keras-tuner = "*"
 numpy = "==1.14.*"
-matplotlib = "*"
+matplotlib = "<=3.0"
+kiwisolver = "==1.1.0"
 
 [requires]
 python_version = "3.7"

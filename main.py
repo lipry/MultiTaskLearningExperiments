@@ -2,7 +2,7 @@ import logging
 import time
 import os
 from src.config.config import config
-from src.data.datasets_import import import_intersected_sequences, input_data
+from src.data.datasets_import import import_full_sequences, input_data
 from src.experiments.cnn_full_parameters_sharing import cnn_fps_executor
 from src.experiments.statistics import statistics_executor
 

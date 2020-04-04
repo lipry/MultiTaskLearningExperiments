@@ -3,15 +3,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 
 
-def sequence2onehot(sequence):
-    # TODO: speedup
-    ltrdict = {'a': np.array([1, 0, 0, 0, 0]),
-               'c': np.array([0, 1, 0, 0, 0]),
-               'g': np.array([0, 0, 1, 0, 0]),
-               't': np.array([0, 0, 0, 1, 0]),
-               'n': np.array([0, 0, 0, 0, 1])
-               }
-    return np.array([ltrdict[x] for x in sequence.lower()])
+def sequence2onehot(sequence, mapping):
+    return np.eye(5)[[mapping[i] for i in sequence.lower()]]
+
+
+def pad_sequence(sequence, max_len):
+    if sequence.shape[0] < max_len:
+        padding = max_len - sequence.shape[0]
+        return np.pad(sequence, [(0, padding), (0, 0)], 'constant')
+    return sequence
 
 
 def encoding_labels(y, t):

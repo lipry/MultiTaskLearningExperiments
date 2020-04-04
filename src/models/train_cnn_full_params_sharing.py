@@ -7,54 +7,54 @@ import tensorflow as tf
 from kerastuner import BayesianOptimization
 from src.config.config import config
 from src.metrics.metrics import auprc, auroc
+import numpy as np
 
 def cnn_full_params_sharing_model(hp):
-    with tf.device("/cpu:0"):
-        inputs = Input(shape=(200,5))
+    config_cnn = config['cnn_full_params_sharing']
+    config_cnn_hp = config['cnn_full_params_sharing']['bayesian_opt']['hyperparameters']
 
-        config_cnn = config['cnn_full_params_sharing']
-        config_cnn_hp = config['cnn_full_params_sharing']['bayesian_opt']['hyperparameters']
+    # hyper-parameters grid preparation
+    learning_rate = hp.Float('learning_rate', min_value=config_cnn_hp['learning_rate'][0],
+                             max_value=config_cnn_hp['learning_rate'][1])
+    kernel_size1 = hp.Choice('kernel_size1', values=config_cnn_hp['kernel_size1'])
+    kernel_size2 = hp.Choice('kernel_size2', values=config_cnn_hp['kernel_size2'])
+    units2 = hp.Choice('units2', values=config_cnn_hp['units2'])
+    dense1 = hp.Choice('dense1', values=config_cnn_hp['dense1'])
+    dense2 = hp.Choice('dense2', values=config_cnn_hp['dense2'])
 
-        # hyper-parameters grid preparation
-        learning_rate = hp.Float('learning_rate', min_value=config_cnn_hp['learning_rate'][0],
-                                 max_value=config_cnn_hp['learning_rate'][1])
-        kernel_size1 = hp.Choice('kernel_size1', values=config_cnn_hp['kernel_size1'])
-        kernel_size2 = hp.Choice('kernel_size2', values=config_cnn_hp['kernel_size2'])
-        units2 = hp.Choice('units2', values=config_cnn_hp['units2'])
-        dense1 = hp.Choice('dense1', values=config_cnn_hp['dense1'])
-        dense2 = hp.Choice('dense2', values=config_cnn_hp['dense2'])
+    inputs = Input(shape=(1000,5))
+    x = Conv1D(64, kernel_size=kernel_size1, activation='relu')(inputs)
+    x = Conv1D(64, kernel_size=kernel_size1, activation='relu')(x)
+    x = Conv1D(64, kernel_size=kernel_size1, activation='relu')(x)
+    x = MaxPooling1D(pool_size=2)(x)
 
-        x = Conv1D(64, kernel_size=kernel_size1, activation='relu')(inputs)
-        x = Conv1D(64, kernel_size=kernel_size1, activation='relu')(x)
-        x = Conv1D(64, kernel_size=kernel_size1, activation='relu')(x)
-        x = MaxPooling1D(pool_size=2)(x)
+    x = Conv1D(units2,
+               kernel_size=kernel_size2,
+               activation='relu')(x)
+    x = MaxPooling1D(pool_size=2)(x)
+    x = Flatten()(x)
 
-        x = Conv1D(units2,
-                   kernel_size=kernel_size2,
-                   activation='relu')(x)
-        x = MaxPooling1D(pool_size=2)(x)
-        x = Flatten()(x)
+    x = Dense(dense1, activation='relu')(x)
+    x = Dropout(0.1)(x)
+    x = Dense(dense2, activation='relu')(x)
+    x = Dropout(0.1)(x)
 
-        x = Dense(dense1, activation='relu')(x)
-        x = Dropout(0.1)(x)
-        x = Dense(dense2, activation='relu')(x)
-        x = Dropout(0.1)(x)
+    # TODO: automatic detection of number of outputs
+    predictions1 = Dense(1, activation='sigmoid', name="pred0")(x)
+    predictions2 = Dense(1, activation='sigmoid', name="pred1")(x)
+    #predictions3 = Dense(1, activation='sigmoid', name="pred2")(x)
+    #predictions4 = Dense(1, activation='sigmoid', name="pred3")(x)
 
-        predictions1 = Dense(1, activation='sigmoid', name="pred0")(x)
-        predictions2 = Dense(1, activation='sigmoid', name="pred1")(x)
-        predictions3 = Dense(1, activation='sigmoid', name="pred2")(x)
-        predictions4 = Dense(1, activation='sigmoid', name="pred3")(x)
+    cnn_model = Model(inputs, [predictions1, predictions2])#, predictions3, predictions4])
 
-        cnn_model = Model(inputs, [predictions1, predictions2, predictions3, predictions4])
-    if config['execution']['n_gpu'] > 1:
-        cnn_model = multi_gpu_model(cnn_model, gpus=config['execution']['n_gpu'])
+    #cnn_model = multi_gpu_model(cnn_model, gpus=config['execution']['n_gpu'])
 
     nadam_opt = Nadam(lr=learning_rate,
                       beta_1=config_cnn['beta_1'],
                       beta_2=config_cnn['beta_2'])
 
-    cnn_model.compile(loss={'pred0': 'binary_crossentropy', 'pred1': 'binary_crossentropy',
-                            'pred2': 'binary_crossentropy', 'pred3': 'binary_crossentropy'},
+    cnn_model.compile(loss={'pred0': 'binary_crossentropy', 'pred1': 'binary_crossentropy'},
+                            #'pred2': 'binary_crossentropy', 'pred3': 'binary_crossentropy'},
                        optimizer=nadam_opt,
                        metrics=[auprc, auroc])
 
@@ -76,10 +76,9 @@ def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val, class_weig
     check_input_type(['seq'], "Cnn full parameter sharing models work just with sequence data, {} found"
                      .format(config['general']['input_type']))
 
-    print(X_train, y_train, X_val, y_val)
-
     config_cnn_bayesian = config['cnn_full_params_sharing']['bayesian_opt']
-    batch_size_total = get_batch_size()
+    #batch_size_total = get_batch_size()
+    batch_size_total = config['cnn_full_params_sharing']['batch_size']
 
     tuner = BayesianOptimization(
         cnn_full_params_sharing_model,

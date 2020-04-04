@@ -2,6 +2,7 @@ FROM nvcr.io/nvidia/tensorflow:19.04-py3  as base
 RUN apt-get update
 
 WORKDIR /app
+
 RUN pip install --upgrade pip
 
 COPY requirements.txt /app/

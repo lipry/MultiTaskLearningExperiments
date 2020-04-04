@@ -25,7 +25,7 @@ def train_val_loss_plot(training_data, validation_data, title, path, exp_name, t
     plt.savefig("{}/{}_{}_loss_{}".format(path, time.strftime("%Y%m%d-%H%M%S"), exp_name, task))
 
 
-def au_plot(training, test, metric, path, exp_name, task, cell_lines=["GM12878", "HelaS3", "HepG2", "K562"]):
+def au_plot(training, test, metric, path, exp_name, task, cell_lines):
     fig, axs = plt.subplots(2, 2, constrained_layout=True, figsize=(15, 13))
     for cell_line, ax in zip(cell_lines, axs.reshape(-1)):
         ax.plot(training[cell_line], color='tab:red', label="Training {}".format(metric))
