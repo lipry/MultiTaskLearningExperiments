@@ -42,17 +42,17 @@ class ResultsCollector:
         self.losses.append(history.history['loss'])
         self.val_losses.append(history.history['val_loss'])
 
-        for pred_idx, cl in enumerate(cell_lines):
-            self.auprc[cl].append(history.history['pred{}_auprc'.format(pred_idx)])
-            self.val_auprc[cl].append(history.history['val_pred{}_auprc'.format(pred_idx)])
-            self.auroc[cl].append(history.history['pred{}_auroc'.format(pred_idx)])
-            self.val_auroc[cl].append(history.history['val_pred{}_auroc'.format(pred_idx)])
+        for cl in cell_lines:
+            self.auprc[cl].append(history.history['pred_{}_auprc'.format(cl)])
+            self.val_auprc[cl].append(history.history['val_pred_{}_auprc'.format(cl)])
+            self.auroc[cl].append(history.history['pred_{}_auroc'.format(cl)])
+            self.val_auroc[cl].append(history.history['val_pred_{}_auroc'.format(cl)])
 
     def add_holdouts_eval(self, eval_metrics, task):
         try:
-            for pred_idx, cl in enumerate(cell_lines):
-                self.eval_auprc[task][cl].append(eval_metrics['pred{}_auprc'.format(pred_idx)])
-                self.eval_auroc[task][cl].append(eval_metrics['pred{}_auroc'.format(pred_idx)])
+            for cl in cell_lines:
+                self.eval_auprc[task][cl].append(eval_metrics['pred_{}_auprc'.format(cl)])
+                self.eval_auroc[task][cl].append(eval_metrics['pred_{}_auroc'.format(cl)])
         except KeyError:
             self.eval_auprc[task] = {c: [] for c in cell_lines}
             self.eval_auroc[task] = {c: [] for c in cell_lines}

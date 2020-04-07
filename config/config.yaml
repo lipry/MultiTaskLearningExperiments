@@ -1,5 +1,5 @@
 data:
-  data_path: data/filtered_reduced
+  data_path: data/filtered
   logs_path: logs
 
 execution:
@@ -14,23 +14,26 @@ general:
   # both: to be implemented (for sequence and epigenetic features together as input)
   # ["A549", "GM12878", "HEPG2", "K562"]
   input_type: "seq"
-  n_holdouts: 2
-  cell_lines: ["A549", "GM12878"]
-  tasks: [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
+  n_holdouts: 10
+  cell_lines: ["A549", "GM12878", "HEPG2", "K562"]
+  # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
+  # [{A-E: 1, A-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
+  # [{A-P: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
+  tasks: [{A-E: 1, A-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
 
 # Used only in
 # CNN Full parameters sharing models
 cnn_full_params_sharing:
-  epochs: 20
+  epochs: 500
   batch_size: 1000
   #learning_rate: 0.02
   beta_1: 0.9
   beta_2: 0.999
   bayesian_opt:
-    max_trials: 10
-    num_initial_points: 5
+    max_trials: 50
+    num_initial_points: 10
     baseline: 0.2
-    patience: 20
+    patience: 100
     min_delta: 0.005
     hyperparameters:
       kernel_size1: [5, 10]

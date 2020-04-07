@@ -40,21 +40,21 @@ def cnn_full_params_sharing_model(hp):
     x = Dropout(0.1)(x)
 
     # TODO: automatic detection of number of outputs
-    predictions1 = Dense(1, activation='sigmoid', name="pred0")(x)
-    predictions2 = Dense(1, activation='sigmoid', name="pred1")(x)
+    #predictions1 = Dense(1, activation='sigmoid', name="pred0")(x)
+    #predictions2 = Dense(1, activation='sigmoid', name="pred1")(x)
     #predictions3 = Dense(1, activation='sigmoid', name="pred2")(x)
     #predictions4 = Dense(1, activation='sigmoid', name="pred3")(x)
+    predictions = [Dense(1, activation='sigmoid', name="pred_{}".format(c))(x)
+                   for c in config['general']['cell_lines']]
 
-    cnn_model = Model(inputs, [predictions1, predictions2])#, predictions3, predictions4])
-
-    #cnn_model = multi_gpu_model(cnn_model, gpus=config['execution']['n_gpu'])
+    cnn_model = Model(inputs, predictions)
 
     nadam_opt = Nadam(lr=learning_rate,
                       beta_1=config_cnn['beta_1'],
                       beta_2=config_cnn['beta_2'])
 
-    cnn_model.compile(loss={'pred0': 'binary_crossentropy', 'pred1': 'binary_crossentropy'},
-                            #'pred2': 'binary_crossentropy', 'pred3': 'binary_crossentropy'},
+    losses = {"pred_{}".format(c): 'binary_crossentropy' for c in config['general']['cell_lines']}
+    cnn_model.compile(loss=losses,
                        optimizer=nadam_opt,
                        metrics=[auprc, auroc])
 

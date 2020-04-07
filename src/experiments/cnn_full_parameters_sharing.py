@@ -4,7 +4,7 @@ from src.data.datasets_helper import group_labels, filter_labels, split_datasets
 from src.models.train_cnn_full_params_sharing import hp_tuning_cnn_full_params_sharing, train_cnn_full_params_sharing, \
     check_input_type
 from src.visualizations.ResultsCollector import ResultsCollector
-from src.visualizations.results_export import copy_experiment_configuration
+from src.visualizations.results_export import copy_experiment_configuration, save_dict
 from src.visualizations.results_helper import hyperparametrs2str
 from src.visualizations.results_plotting import train_val_loss_plot, au_plot, evaluation_performance_plot
 
@@ -38,9 +38,6 @@ def cnn_fps_executor(X, y, logger, path_logs):
 
         X_filtered, y_filtered = filter_labels(X, y, t_labels[0], t_labels[1], t)
         weight_class = calculate_class_weights(y_filtered)
-
-        print("X_filtered len: {}".format(len(X_filtered)))
-        print("X_filtered: {}".format(X_filtered))
 
         results.init_metrics()
         for h in range(holdouts):
@@ -92,9 +89,14 @@ def cnn_fps_executor(X, y, logger, path_logs):
         results.save_metrics(path_logs, "fps_metrics", task_name)
 
     auprc_eval_mean, auprc_eval_std = results.get_eval_auprc()
-    evaluation_performance_plot(auprc_eval_mean, auprc_eval_std, "Evaluation AUPRC", path_logs, "auprc_eval", "auprc")
+    #evaluation_performance_plot(auprc_eval_mean, auprc_eval_std, "Evaluation AUPRC", path_logs, "auprc_eval", "auprc")
+    save_dict(path_logs, "fps_auprc_eval_mean", auprc_eval_mean)
+    save_dict(path_logs, "fps_auprc_eval_std", auprc_eval_std)
+
 
     auroc_eval_mean, auroc_eval_std = results.get_eval_auroc()
-    evaluation_performance_plot(auroc_eval_mean, auroc_eval_std, "Evaluation AUROC", path_logs, "auroc_eval", "auroc")
+    #evaluation_performance_plot(auroc_eval_mean, auroc_eval_std, "Evaluation AUROC", path_logs, "auroc_eval", "auroc")
+    save_dict(path_logs, "fps_auroc_eval_mean", auroc_eval_mean)
+    save_dict(path_logs, "fps_auroc_eval_std", auroc_eval_std)
 
     copy_experiment_configuration(path_logs)
