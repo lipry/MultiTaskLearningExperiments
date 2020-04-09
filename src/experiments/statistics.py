@@ -13,7 +13,11 @@ def bool2int(x: object) -> object:
 def statistics_executor(X, y, logger, path_logs):
     logger.debug("STATISTICS: ")
     tasks_dict = config['general']['tasks']
+    cell_lines = config['general']['cell_lines']
     #tasks = get_task_list(config['general']['tasks'])
+    logger.debug("NUMBER OF FEATURE FOR EVERY CELL LINES:")
+    for cl_idx, cl in enumerate(cell_lines):
+        logger.debug("{}: {}".format(cl, len(X[cl_idx][0])))
 
     for t in tasks_dict:
         print("t: {}".format(t))

@@ -8,14 +8,14 @@ execution:
 general:
   # fps: full parameter sharing,
   # stats: to get some statistics about datasets
-  experiment: "fps"
+  experiment: "stats"
   # epi: for epigenetic features as input
   # seq: for sequences as input
   # both: to be implemented (for sequence and epigenetic features together as input)
   # ["A549", "GM12878", "HEPG2", "K562"]
-  input_type: "seq"
+  input_type: "epi"
   n_holdouts: 10
-  cell_lines: ["A549", "GM12878", "HEPG2", "K562"]
+  cell_lines: ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF-7"]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
   # [{A-E: 1, A-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
   # [{A-P: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
