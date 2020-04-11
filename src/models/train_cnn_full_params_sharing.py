@@ -1,13 +1,13 @@
-from tensorflow.keras.callbacks import EarlyStopping
+from kerastuner import BayesianOptimization
 from tensorflow.keras import Input, Model
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten, Dense, Dropout
 from tensorflow.keras.optimizers import Nadam
-from tensorflow.keras.utils import multi_gpu_model
-import tensorflow as tf
-from kerastuner import BayesianOptimization
+
 from src.config.config import config
+from src.experiments.experiments_helper import get_batch_size, check_input_type
 from src.metrics.metrics import auprc, auroc
-import numpy as np
+
 
 def cnn_full_params_sharing_model(hp):
     config_cnn = config['cnn_full_params_sharing']
@@ -59,17 +59,6 @@ def cnn_full_params_sharing_model(hp):
                        metrics=[auprc, auroc])
 
     return cnn_model
-
-
-def get_batch_size():
-    n_gpu = config['execution']['n_gpu']
-    batch_size = config['cnn_full_params_sharing']['batch_size']
-    return n_gpu * batch_size if n_gpu > 0 else batch_size
-
-
-def check_input_type(admitted_input, message):
-    if config['general']['input_type'] not in admitted_input:
-        raise ValueError(message)
 
 
 def hp_tuning_cnn_full_params_sharing(X_train, y_train, X_val, y_val, class_weight, n_best_models=1):

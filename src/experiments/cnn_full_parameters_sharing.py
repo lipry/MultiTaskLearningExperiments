@@ -1,15 +1,15 @@
 from src.config.config import config
 from src.config.config_utils import get_task_labels
 from src.data.datasets_helper import group_labels, filter_labels, split_datasets, calculate_class_weights
-from src.models.train_cnn_full_params_sharing import hp_tuning_cnn_full_params_sharing, train_cnn_full_params_sharing, \
-    check_input_type
+from src.models.train_cnn_full_params_sharing import hp_tuning_cnn_full_params_sharing, train_cnn_full_params_sharing
+from src.experiments.experiments_helper import check_input_type
 from src.visualizations.ResultsCollector import ResultsCollector
 from src.visualizations.results_export import copy_experiment_configuration, save_dict
 from src.visualizations.results_helper import hyperparametrs2str
 from src.visualizations.results_plotting import train_val_loss_plot, au_plot, evaluation_performance_plot
 
 def cnn_fps_executor(X, y, logger, path_logs):
-    check_input_type(['seq'], "Cnn full parameter sharing models work just with epigenetic data, {} found"
+    check_input_type(['seq'], "Cnn full parameter sharing models work just with sequence data, {} found"
                      .format(config['general']['input_type']))
 
     holdouts = config['general']['n_holdouts']

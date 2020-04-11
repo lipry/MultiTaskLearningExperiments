@@ -13,3 +13,6 @@ def copy_experiment_configuration(path):
 def save_dict(path, exp_name, data):
     with open("{}/{}.pkl".format(path, exp_name), 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+
+def save_tsne(path, exp_name, data):
+    np.savez("{}/{}.npz".format(path, exp_name), **data)

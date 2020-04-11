@@ -8,6 +8,8 @@ from src.experiments.statistics import statistics_executor
 
 
 # get configurations
+from src.experiments.tsne import tsne_executor
+
 files_path = config['data']['data_path']
 logs_path = config['data']['logs_path']
 exp = config['general']['experiment']
@@ -39,5 +41,8 @@ if exp == "fps":
 
 if exp == "stats":
     statistics_executor(X, y, logger, path_logs)
+
+if exp == "tsne":
+    tsne_executor(X, y, logger, path_logs)
 
 

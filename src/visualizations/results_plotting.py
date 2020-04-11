@@ -2,6 +2,8 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
+from src.config.config import config
+
 
 def train_val_loss_plot(training_data, validation_data, title, path, exp_name, task):
     # Draw Plot
@@ -71,3 +73,28 @@ def evaluation_performance_plot(results, std_dev, title, path, exp_name, metric)
     # Create legend & show graphic
     plt.legend(loc='lower left', prop={'size': 10})
     plt.savefig("{}/{}_{}_{}".format(path, time.strftime("%Y%m%d-%H%M%S"), exp_name, metric))
+
+def plot_tsne(results, path, file_name):
+    for t in config['general']['tasks']:
+        task_name = "{}vs{}".format(*t.keys())
+
+        fig = plt.figure(figsize=(20, 30))
+
+        for i, cl in zip(range(1, 9), config['general']['cell_lines']):
+            ax = fig.add_subplot(4, 2, i)
+
+            data = results["{}_{}".format(task_name, cl)]
+            blue = data[data[:, 2] == 1]
+            red = data[data[:, 2] == 0]
+            ax.scatter(blue[:, 0], blue[:, 1], c='b', alpha=0.3, s=3, label=list(t.keys())[list(t.values()).index(1)])
+            ax.scatter(red[:, 0], red[:, 1], c='r', alpha=0.1, s=3, label=list(t.keys())[list(t.values()).index(0)])
+
+            ax.set_title("t-SNE for {}".format(cl))
+            lgnd = ax.legend(loc='upper right', prop={'size': 15})
+            for handle in lgnd.legendHandles:
+                handle.set_sizes([10.0])
+                handle.set_alpha(1.0)
+
+        plt.suptitle('{}  t-SNE for all the cell lines (perplexity: {})'.format(task_name, config['tsne']['perplexity']), fontsize=20, y=0.92)
+
+        plt.savefig("{}/{}_{}_{}.png".format(path, time.strftime("%Y%m%d-%H%M%S"), task_name, file_name), bbox_inches='tight')

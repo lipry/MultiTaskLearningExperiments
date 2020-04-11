@@ -1,6 +1,7 @@
 -i https://pypi.org/simple
 biopython==1.76
-certifi==2019.11.28
+certifi==2020.4.5.1
+cffi==1.14.0
 chardet==3.0.4
 colorama==0.4.3
 cycler==0.10.0
@@ -14,8 +15,10 @@ keras-tuner==1.0.1
 keras==2.3.0
 kiwisolver==1.1.0
 matplotlib==3.0.0
+multicoretsne==0.1
 numpy==1.14.6
-pyparsing==2.4.6
+pycparser==2.20
+pyparsing==2.4.7
 python-dateutil==2.8.1
 pyyaml==5.3.1
 requests==2.23.0
