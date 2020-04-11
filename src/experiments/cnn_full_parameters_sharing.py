@@ -18,25 +18,9 @@ def cnn_fps_executor(X, y, logger, path_logs):
     results = ResultsCollector()
     results.init_eval_metrics()
     for t in tasks_dict:
-        t_labels = get_task_labels(t)
-        task_name = "{}vs{}".format(t_labels[0], t_labels[1])
-
+        task_name, X_filtered, y_filtered = filter_labels(X, y, t)
         logger.debug("NEW EXPERIMENT: {}".format(task_name))
-        # TODO: put in some general function
-        # Grouping particular labels for some tasks
-        if t_labels[0] == 'A-E+A-P':
-            y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
 
-        if t_labels[0] == 'BG':
-            y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
-
-        if t_labels[1] == 'A-E+A-P':
-            y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
-
-        if t_labels[1] == 'BG':
-            y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
-
-        X_filtered, y_filtered = filter_labels(X, y, t_labels[0], t_labels[1], t)
         weight_class = calculate_class_weights(y_filtered)
 
         results.init_metrics()

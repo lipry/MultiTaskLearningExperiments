@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 
+from src.config.config_utils import get_task_labels
+
 
 def sequence2onehot(sequence, mapping):
     return np.eye(5)[[mapping[i] for i in sequence.lower()]]
@@ -23,10 +25,25 @@ def group_labels(y, labels, group_name):
     return [np.array([group_name if elem in labels else elem for elem in l]) for l in y]
 
 
-def filter_labels(X, y, label_a, label_b, t):
-    conditions = [all(label in [label_a, label_b] for label in elem) for elem in zip(*y)]
+def filter_labels(X, y, t):
+    t_labels = get_task_labels(t)
+    task_name = "{}vs{}".format(t_labels[0], t_labels[1])
+
+    if t_labels[0] == 'A-E+A-P':
+        y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
+
+    if t_labels[0] == 'BG':
+        y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
+
+    if t_labels[1] == 'A-E+A-P':
+        y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
+
+    if t_labels[1] == 'BG':
+        y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
+
+    conditions = [all(label in [t_labels[0], t_labels[1]] for label in elem) for elem in zip(*y)]
     indices = np.where(conditions)[0]
-    return [x[indices] for x in X], [encoding_labels(l[indices], t) for l in y]
+    return task_name, [x[indices] for x in X], [encoding_labels(l[indices], t) for l in y]
 
 
 def calculate_class_weights(labels):

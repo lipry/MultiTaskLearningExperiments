@@ -20,25 +20,8 @@ def statistics_executor(X, y, logger, path_logs):
         logger.debug("{}: {}".format(cl, len(X[cl_idx][0])))
 
     for t in tasks_dict:
-        print("t: {}".format(t))
-        t_labels = get_task_labels(t)
-        task_name = "{}vs{}".format(t_labels[0], t_labels[1])
-
+        task_name, _, y_filtered = filter_labels(X, y, t)
         logger.debug("NEW EXPERIMENT: {}".format(task_name))
-
-        if t_labels[0] == 'A-E+A-P':
-            y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
-
-        if t_labels[0] == 'BG':
-            y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
-
-        if t_labels[1] == 'A-E+A-P':
-            y = group_labels(y, ['A-E', 'A-P'], 'A-E+A-P')
-
-        if t_labels[1] == 'BG':
-            y = group_labels(y, ["I-E", "I-P", "UK", "A-X", "I-X"], 'BG')
-
-        _, y_filtered = filter_labels(X, y, t_labels[0], t_labels[1], t)
         stacked = np.column_stack((y_filtered[0], y_filtered[1], y_filtered[2], y_filtered[3]))
 
         logger.debug("Task {}".format(task_name))
