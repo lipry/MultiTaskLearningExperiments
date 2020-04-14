@@ -8,30 +8,30 @@ execution:
 general:
   # fps: full parameter sharing,
   # stats: to get some statistics about datasets
-  experiment: "tsne"
+  experiment: "fps"
   # epi: for epigenetic features as input
   # seq: for sequences as input
   # both: to be implemented (for sequence and epigenetic features together as input)
-  input_type: "epi"
-  n_holdouts: 10
+  input_type: "seq"
+  n_holdouts: 2
   # ["A549", "GM12878", "HEPG2", "K562"]
   # ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
-  cell_lines: ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
+  cell_lines: ["A549", "GM12878"] #, "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
   # [{A-E: 1, A-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
   # [{A-P: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
-  tasks: [{A-E: 1, A-P: 0}, {I-P: 0, A-P: 1}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
+  tasks: [{A-E: 1, A-P: 0}]#, {I-P: 0, A-P: 1}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
 
 # Used only in
 # CNN Full parameters sharing models
 cnn_full_params_sharing:
-  epochs: 500
+  epochs: 10
   batch_size: 1000
   #learning_rate: 0.02
   beta_1: 0.9
   beta_2: 0.999
   bayesian_opt:
-    max_trials: 50
+    max_trials: 30
     num_initial_points: 10
     baseline: 0.2
     patience: 100

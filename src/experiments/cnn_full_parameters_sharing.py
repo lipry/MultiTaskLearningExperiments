@@ -1,8 +1,8 @@
 from src.config.config import config
-from src.config.config_utils import get_task_labels
-from src.data.datasets_helper import group_labels, filter_labels, split_datasets, calculate_class_weights
-from src.models.train_cnn_full_params_sharing import hp_tuning_cnn_full_params_sharing, train_cnn_full_params_sharing
+from src.data.datasets_helper import filter_labels, split_datasets, calculate_class_weights
+from src.models.models_helper import hp_tuner, model_trainer
 from src.experiments.experiments_helper import check_input_type
+from src.models.train_cnn_full_params_sharing import cnn_full_params_sharing_model
 from src.visualizations.ResultsCollector import ResultsCollector
 from src.visualizations.results_export import copy_experiment_configuration, save_dict
 from src.visualizations.results_helper import hyperparametrs2str
@@ -36,15 +36,27 @@ def cnn_fps_executor(X, y, logger, path_logs):
                              .format(len(X_train_int[0]), len(X_val[0]), len(X_test[0])))
 
             logger.debug("Tuning hyper-parameters ({}/{} holdout)".format(h + 1, holdouts))
-            tuner, _, best_hyperparams = hp_tuning_cnn_full_params_sharing(X_train_int[0], y_train_int, X_val[0], y_val,
-                                                                           weight_class, 1)
+            tuner, _, best_hyperparams = hp_tuner(X_train_int[0],
+                                                  y_train_int,
+                                                  X_val[0],
+                                                  y_val,
+                                                  cnn_full_params_sharing_model,
+                                                  "cnn_full_params_sharing",
+                                                  weight_class,
+                                                  1)
 
             logger.debug("Best hyperparams found: {}".format(hyperparametrs2str(tuner)))
 
             # Retraining model with best hyperparameters found
             logger.debug("Training model with best hyperparameters ({}/{} holdout)".format(h + 1, holdouts))
-            best_model, history = train_cnn_full_params_sharing(X_train[0], y_train, X_test[0], y_test, weight_class,
-                                                                best_hyperparams[0])
+            best_model, history = model_trainer(X_train[0],
+                                                y_train,
+                                                X_test[0],
+                                                y_test,
+                                                cnn_full_params_sharing_model,
+                                                "cnn_full_params_sharing",
+                                                weight_class,
+                                                best_hyperparams[0])
             results.add_holdout_results(history)
 
             # Evaluating best model performances
