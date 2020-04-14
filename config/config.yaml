@@ -44,6 +44,23 @@ cnn_full_params_sharing:
       dense2: [32, 64]
       learning_rate: [0.0, 0.2]
 
+multi_layers_perceptron:
+  dropout: 0.2
+  decay: 0.01
+  momentum: 0.5
+  nesterov: True
+  bayesian_opt:
+    hyperparameters:
+      learning_rate: [0.01, 0.2]
+      input_layers: [1, 5]
+      input_neurons: [2, 4, 8, 16, 32, 64]
+      main_layers: [1, 8]
+      main_neurons: [2, 4, 8, 16, 32, 64, 128, 256]
+      output_layers: [1, 5]
+      output_neurons: [2, 4, 8, 16 , 32, 64]
+
+
+
 tsne:
   save_plots: True
   perplexity: 50
