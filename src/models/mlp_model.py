@@ -1,16 +1,14 @@
 from tensorflow.keras.optimizers import SGD
-from tensorflow.keras.layers import Concatenate
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Concatenate, Dropout, Dense
 from tensorflow.keras import Input, Model
-from tensorflow.layers.core import Dropout
 
 from src.config.config import config
 from src.metrics.metrics import auprc, auroc
 
 
-def cnn_full_params_sharing_model(hp):
-    config_mlp = config['mlp']
-    config_mlp_hp = config['mlp']['bayesian_opt']['hyperparameters']
+def mlp_model(input_dims, hp):
+    config_mlp = config['multi_layers_perceptron']
+    config_mlp_hp = config['multi_layers_perceptron']['bayesian_opt']['hyperparameters']
 
     # Varible hyperparameters (choosen by bayesian optimizer)
     input_layers = hp.Int('input_layers', min_value=config_mlp_hp['input_layers'][0],
@@ -34,16 +32,17 @@ def cnn_full_params_sharing_model(hp):
     nesterov = config_mlp['nesterov']
 
 
-    inputs = [build_input_branch(c, input_layers, input_neurons, dropout) for c in config['general']['cell_lines']]
+    inputs = [build_input_branch(c, dim, input_layers, input_neurons, dropout)
+              for dim, c in zip(input_dims, config['general']['cell_lines'])]
 
-    x = Concatenate(inputs)
+    x = Concatenate()([i[1] for i in inputs])
     for layer in range(body_layers):
-        x = Dense(main_neurons, activation="ReLU")(x)
+        x = Dense(main_neurons, activation="relu")(x)
         x = Dropout(dropout)(x)
 
     outputs = [build_output_branch(c, output_layers, output_neurons, dropout, x) for c in config['general']['cell_lines']]
 
-    mlp_model = Model(inputs, outputs)
+    mlp_model = Model([i[0] for i in inputs], outputs)
 
     sgd_opt = SGD(lr=learning_rate,
                   decay=decay,
@@ -55,26 +54,29 @@ def cnn_full_params_sharing_model(hp):
                        optimizer=sgd_opt,
                        metrics=[auprc, auroc])
 
+    print(mlp_model.summary())
+
     return mlp_model
 
-def build_input_branch(branch_name, n_layers, n_neurons, dropout):
-    input = Input(shape=(None, ), name="input_{}".format(branch_name))
+def build_input_branch(branch_name, input_dim, n_layers, n_neurons, dropout):
+    print(input_dim)
+    input = Input(shape=(input_dim, ), name="input_{}".format(branch_name))
 
-    x = Dense(n_neurons, activation="ReLU")(input)
+    x = Dense(n_neurons, activation="relu")(input)
     x = Dropout(dropout)(x)
     for layer in range(n_layers-1):
-        x = Dense(n_neurons, activation="ReLU")(x)
+        x = Dense(n_neurons, activation="relu")(x)
         x = Dropout(dropout)(x)
 
-    return x
+    return input, x
 
 def build_output_branch(branch_name, n_layers, n_neurons, dropout, prev):
-    x = Dense(n_neurons, activation="ReLU")(prev)
+    x = Dense(n_neurons, activation="relu")(prev)
     x = Dropout(dropout)(x)
     for layer in range(n_layers-1):
-        x = Dense(n_neurons, activation="ReLU")(x)
+        x = Dense(n_neurons, activation="relu")(x)
         x = Dropout(dropout)(x)
 
-    x = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name))
+    pred = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name))(x)
 
-    return x
+    return pred

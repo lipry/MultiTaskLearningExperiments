@@ -1,14 +1,16 @@
 import logging
 import time
 import os
+from functools import partial
+
 from src.config.config import config
-from src.data.datasets_import import import_full_sequences, input_data
-from src.experiments.cnn_full_parameters_sharing import cnn_fps_executor
+from src.data.datasets_import import input_data
+from src.experiments.experiments_helper import holdouts_experiments_executor, check_input_type
 from src.experiments.statistics import statistics_executor
-
-
-# get configurations
 from src.experiments.tsne import tsne_executor
+from src.models.cnn_full_params_sharing_model import cnn_full_params_sharing_model
+from src.models.mlp_model import mlp_model
+
 
 files_path = config['data']['data_path']
 logs_path = config['data']['logs_path']
@@ -37,7 +39,19 @@ logger.debug("Importing data...")
 X, y = input_data(files_path, input_type=config['general']['input_type'])
 
 if exp == "fps":
-    cnn_fps_executor(X, y, logger, path_logs)
+    check_input_type(['seq'], "Cnn full parameter sharing models work just with sequence data, {} found"
+                     .format(config['general']['input_type']))
+
+    holdouts_experiments_executor("cnn_full_params_sharing", X, y, logger, path_logs, cnn_full_params_sharing_model, "seq")
+
+if exp == "mlp":
+    check_input_type(['epi'], "Multi Layer Perceptron model work just with epigenomic data, {} found"
+                     .format(config['general']['input_type']))
+
+    input_dims = [len(x[0]) for x in X]
+    mlp_model_red = partial(mlp_model, input_dims)
+
+    holdouts_experiments_executor("multi_layers_perceptron", X, y, logger, path_logs, mlp_model_red, "epi")
 
 if exp == "stats":
     statistics_executor(X, y, logger, path_logs)

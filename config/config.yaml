@@ -6,13 +6,15 @@ execution:
   n_gpu: 2
 
 general:
-  # fps: full parameter sharing,
-  # stats: to get some statistics about datasets
-  experiment: "fps"
+  # fps: full parameter sharing;
+  # mlp: Multi layer perceptron;
+  # stats: to get some statistics about datasets;
+  # tsne: to project the data in a 2D space using t-SNE;
+  experiment: "mlp"
   # epi: for epigenetic features as input
   # seq: for sequences as input
   # both: to be implemented (for sequence and epigenetic features together as input)
-  input_type: "seq"
+  input_type: "epi"
   n_holdouts: 2
   # ["A549", "GM12878", "HEPG2", "K562"]
   # ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
@@ -45,11 +47,18 @@ cnn_full_params_sharing:
       learning_rate: [0.0, 0.2]
 
 multi_layers_perceptron:
+  epochs: 10
+  batch_size: 1000
   dropout: 0.2
   decay: 0.01
   momentum: 0.5
   nesterov: True
   bayesian_opt:
+    max_trials: 30
+    num_initial_points: 10
+    baseline: 0.2
+    patience: 100
+    min_delta: 0.005
     hyperparameters:
       learning_rate: [0.01, 0.2]
       input_layers: [1, 5]

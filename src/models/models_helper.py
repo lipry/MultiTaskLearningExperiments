@@ -1,5 +1,4 @@
 from src.config.config import config
-from src.experiments.experiments_helper import get_batch_size, check_input_type
 from tensorflow.keras.callbacks import EarlyStopping
 from kerastuner import BayesianOptimization
 
@@ -30,12 +29,12 @@ def hp_tuner(X_train, y_train, X_val, y_val, model_fun, exp_name, class_weight, 
 
 
 def model_trainer(X_train, y_train, X_val, y_val, model_fun, exp_name, class_weight, training_hp):
-    batch_size_total = get_batch_size()
+    #batch_size_total = get_batch_size()
     model = model_fun(training_hp)
     history = model.fit(X_train, y_train,
              epochs=config[exp_name]['epochs'],
              class_weight=class_weight,
-             batch_size=batch_size_total,
+             batch_size=config[exp_name]['batch_size'],
              validation_data=(X_val, y_val))
 
     return model, history
