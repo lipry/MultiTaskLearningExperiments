@@ -54,29 +54,24 @@ def mlp_model(input_dims, hp):
                        optimizer=sgd_opt,
                        metrics=[auprc, auroc])
 
-    print(mlp_model.summary())
-
     return mlp_model
 
-def build_input_branch(branch_name, input_dim, n_layers, n_neurons, dropout):
-    print(input_dim)
-    input = Input(shape=(input_dim, ), name="input_{}".format(branch_name))
-
-    x = Dense(n_neurons, activation="relu")(input)
-    x = Dropout(dropout)(x)
-    for layer in range(n_layers-1):
-        x = Dense(n_neurons, activation="relu")(x)
-        x = Dropout(dropout)(x)
-
-    return input, x
-
-def build_output_branch(branch_name, n_layers, n_neurons, dropout, prev):
+def build_branch(n_layers, n_neurons, dropout, prev):
     x = Dense(n_neurons, activation="relu")(prev)
     x = Dropout(dropout)(x)
     for layer in range(n_layers-1):
         x = Dense(n_neurons, activation="relu")(x)
         x = Dropout(dropout)(x)
 
+    return x
+
+def build_input_branch(branch_name, input_dim, n_layers, n_neurons, dropout):
+    input = Input(shape=(input_dim, ), name="input_{}".format(branch_name))
+    x = build_branch(n_layers, n_neurons, dropout, input)
+    return input, x
+
+def build_output_branch(branch_name, n_layers, n_neurons, dropout, prev):
+    x = build_branch(n_layers, n_neurons, dropout, prev)
     pred = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name))(x)
 
     return pred

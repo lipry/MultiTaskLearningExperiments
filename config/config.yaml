@@ -15,14 +15,14 @@ general:
   # seq: for sequences as input
   # both: to be implemented (for sequence and epigenetic features together as input)
   input_type: "epi"
-  n_holdouts: 2
+  n_holdouts: 10
   # ["A549", "GM12878", "HEPG2", "K562"]
   # ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
-  cell_lines: ["A549", "GM12878"] #, "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
+  cell_lines: ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
   # [{A-E: 1, A-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
   # [{A-P: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
-  tasks: [{A-E: 1, A-P: 0}]#, {I-P: 0, A-P: 1}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
+  tasks: [{A-E: 1, A-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
 
 # Used only in
 # CNN Full parameters sharing models
@@ -47,18 +47,18 @@ cnn_full_params_sharing:
       learning_rate: [0.0, 0.2]
 
 multi_layers_perceptron:
-  epochs: 10
+  epochs: 600
   batch_size: 1000
   dropout: 0.2
   decay: 0.01
   momentum: 0.5
   nesterov: True
   bayesian_opt:
-    max_trials: 30
-    num_initial_points: 10
+    max_trials: 200
+    num_initial_points: 30
     baseline: 0.2
     patience: 100
-    min_delta: 0.005
+    min_delta: 0.0005
     hyperparameters:
       learning_rate: [0.01, 0.2]
       input_layers: [1, 5]
