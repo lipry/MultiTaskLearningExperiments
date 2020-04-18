@@ -47,7 +47,7 @@ cnn_full_params_sharing:
       learning_rate: [0.0, 0.2]
 
 multi_layers_perceptron:
-  epochs: 600
+  epochs: 800
   batch_size: 1000
   dropout: 0.2
   decay: 0.01
@@ -55,7 +55,7 @@ multi_layers_perceptron:
   nesterov: True
   bayesian_opt:
     max_trials: 200
-    num_initial_points: 30
+    num_initial_points: 50
     baseline: 0.2
     patience: 100
     min_delta: 0.0005

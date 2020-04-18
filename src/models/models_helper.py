@@ -1,3 +1,5 @@
+import time
+
 from src.config.config import config
 from tensorflow.keras.callbacks import EarlyStopping
 from kerastuner import BayesianOptimization
@@ -13,7 +15,7 @@ def hp_tuner(X_train, y_train, X_val, y_val, model_fun, exp_name, class_weight, 
         max_trials=config_bayesian['max_trials'],
         num_initial_points=config_bayesian['num_initial_points'],
         directory='tuner_results',
-        project_name='cnn_full_params_sharing')
+        project_name="{}_{}".format(exp_name, int(time.time())))
 
     es = EarlyStopping(monitor='val_loss', patience=config_bayesian['patience'],
                        min_delta=config_bayesian['min_delta'])

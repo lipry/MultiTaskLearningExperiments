@@ -52,7 +52,7 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
                                                   weight_class,
                                                   1)
 
-            logger.debug("Best hyperparams found: {}".format(hyperparametrs2str(tuner)))
+            logger.debug("Best hyperparams found: {}".format(hyperparametrs2str(best_hyperparams)))
 
             # Retraining model with best hyperparameters found
             logger.debug("Training model with best hyperparameters ({}/{} holdout)".format(h + 1, holdouts))

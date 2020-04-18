@@ -12,10 +12,15 @@ def get_holdouts_mean(X, X_val):
 def apply_fun_to_items(X, f):
     return {cell_line: f(values) for cell_line, values in X.items()}
 
-def hyperparametrs2str(tuner, max_trials=4):
-    f = io.StringIO()
-    with contextlib.redirect_stdout(f):
-        tuner.results_summary(max_trials)
-    return f.getvalue()
+# def hyperparametrs2str(tuner, max_trials=4):
+#     f = io.StringIO()
+#     with contextlib.redirect_stdout(f):
+#         tuner.results_summary(max_trials)
+#     return f.getvalue()
 
+def hyperparametrs2str(hyperparams, max_trials=4):
+    str = "BEST {} MODELS FOUND:\n".format(max_trials)
+    for hp in hyperparams:
+        str+= "{}\n".format(hp.values)
+    return str
 

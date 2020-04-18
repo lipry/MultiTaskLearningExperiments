@@ -24,6 +24,14 @@ def mlp_model(input_dims, hp):
     learning_rate = hp.Float('learning_rate', min_value=config_mlp_hp['learning_rate'][0],
                              max_value=config_mlp_hp['learning_rate'][1])
 
+    # print("input_layers: {}".format(input_layers))
+    # print("input_neurons: {}".format(input_neurons))
+    # print("body_layers: {}".format(body_layers))
+    # print("main_neurons: {}".format(main_neurons))
+    # print("output_layers: {}".format(output_layers))
+    # print("output_neurons: {}".format(output_neurons))
+    # print("learning_rate: {}".format(learning_rate))
+
     # Fixed hyper parameters
     # TODO: fixed droput rigth now.
     dropout = config_mlp['dropout']
