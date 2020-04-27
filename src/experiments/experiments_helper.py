@@ -22,6 +22,8 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
     holdouts = config['general']['n_holdouts']
     tasks_dict = config['general']['tasks']
 
+    copy_experiment_configuration(path_logs)
+
     results = ResultsCollector()
     results.init_eval_metrics()
     for t in tasks_dict:
@@ -101,4 +103,4 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
     save_dict(path_logs, "fps_auroc_eval_mean", auroc_eval_mean)
     save_dict(path_logs, "fps_auroc_eval_std", auroc_eval_std)
 
-    copy_experiment_configuration(path_logs)
+    #copy_experiment_configuration(path_logs)

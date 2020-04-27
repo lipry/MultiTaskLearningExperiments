@@ -1,5 +1,5 @@
 data:
-  data_path: data/filtered
+  data_path: data/filtered_selected_features
   logs_path: logs
 
 execution:
@@ -27,7 +27,7 @@ general:
 # Used only in
 # CNN Full parameters sharing models
 cnn_full_params_sharing:
-  epochs: 10
+  epochs: 1000
   batch_size: 1000
   #learning_rate: 0.02
   beta_1: 0.9
@@ -47,18 +47,18 @@ cnn_full_params_sharing:
       learning_rate: [0.0, 0.2]
 
 multi_layers_perceptron:
-  epochs: 800
-  batch_size: 1000
+  epochs: 500
+  batch_size: 5000
   dropout: 0.2
   decay: 0.01
   momentum: 0.5
   nesterov: True
   bayesian_opt:
-    max_trials: 200
-    num_initial_points: 50
+    max_trials: 25
+    num_initial_points: 5
     baseline: 0.2
     patience: 100
-    min_delta: 0.0005
+    min_delta: 0.001
     hyperparameters:
       learning_rate: [0.01, 0.2]
       input_layers: [1, 5]

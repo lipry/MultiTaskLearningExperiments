@@ -18,8 +18,8 @@ def apply_fun_to_items(X, f):
 #         tuner.results_summary(max_trials)
 #     return f.getvalue()
 
-def hyperparametrs2str(hyperparams, max_trials=4):
-    str = "BEST {} MODELS FOUND:\n".format(max_trials)
+def hyperparametrs2str(hyperparams):
+    str = "BEST {} MODELS FOUND:\n".format(len(hyperparams))
     for hp in hyperparams:
         str+= "{}\n".format(hp.values)
     return str
