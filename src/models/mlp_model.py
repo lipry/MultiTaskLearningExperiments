@@ -1,3 +1,4 @@
+from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.layers import Concatenate, Dropout, Dense
 from tensorflow.keras import Input, Model
@@ -45,7 +46,7 @@ def mlp_model(input_dims, hp):
 
     x = Concatenate()([i[1] for i in inputs])
     for layer in range(body_layers):
-        x = Dense(main_neurons, activation="relu")(x)
+        x = Dense(main_neurons, activation="relu", activity_regularizer=l2(0.01))(x)
         x = Dropout(dropout)(x)
 
     outputs = [build_output_branch(c, output_layers, output_neurons, dropout, x) for c in config['general']['cell_lines']]
@@ -65,10 +66,10 @@ def mlp_model(input_dims, hp):
     return mlp_model
 
 def build_branch(n_layers, n_neurons, dropout, prev):
-    x = Dense(n_neurons, activation="relu")(prev)
+    x = Dense(n_neurons, activation="relu",  activity_regularizer=l2(0.01))(prev)
     x = Dropout(dropout)(x)
     for layer in range(n_layers-1):
-        x = Dense(n_neurons, activation="relu")(x)
+        x = Dense(n_neurons, activation="relu",  activity_regularizer=l2(0.01))(x)
         x = Dropout(dropout)(x)
 
     return x
@@ -80,6 +81,6 @@ def build_input_branch(branch_name, input_dim, n_layers, n_neurons, dropout):
 
 def build_output_branch(branch_name, n_layers, n_neurons, dropout, prev):
     x = build_branch(n_layers, n_neurons, dropout, prev)
-    pred = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name))(x)
+    pred = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name),  activity_regularizer=l2(0.01))(x)
 
     return pred
