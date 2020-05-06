@@ -18,7 +18,8 @@ general:
   n_holdouts: 10
   # ["A549", "GM12878", "HEPG2", "K562"]
   # ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
-  cell_lines: ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
+  # ["A549", "HEPG2"]
+  cell_lines: ["A549", "HEPG2"]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}]
   # [{A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
@@ -49,11 +50,13 @@ cnn_full_params_sharing:
 
 multi_layers_perceptron:
   epochs: 500
-  batch_size: 10000
-  dropout: 0.5
+  batch_size: 5000
+  dropout: 0.2
   decay: 0.01
-  momentum: 0.9
+  momentum: 0.5
   nesterov: True
+  kernel_regularizer: False
+  regularizer_lambda: 0.01
   bayesian_opt:
     max_trials: 25
     num_initial_points: 5

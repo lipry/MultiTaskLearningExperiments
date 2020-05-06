@@ -39,17 +39,18 @@ def mlp_model(input_dims, hp):
     decay = config_mlp['decay']
     momentum = config_mlp['momentum']
     nesterov = config_mlp['nesterov']
+    regularizer_lambda = config_mlp['regularizer_lambda'] if config_mlp['kernel_regularizer'] else 0.0
 
 
-    inputs = [build_input_branch(c, dim, input_layers, input_neurons, dropout)
+    inputs = [build_input_branch(c, dim, input_layers, input_neurons, dropout, regularizer_lambda)
               for dim, c in zip(input_dims, config['general']['cell_lines'])]
 
     x = Concatenate()([i[1] for i in inputs])
     for layer in range(body_layers):
-        x = Dense(main_neurons, activation="relu", activity_regularizer=l2(0.01))(x)
+        x = Dense(main_neurons, activation="relu", kernel_regularizer=l2(regularizer_lambda))(x)
         x = Dropout(dropout)(x)
 
-    outputs = [build_output_branch(c, output_layers, output_neurons, dropout, x) for c in config['general']['cell_lines']]
+    outputs = [build_output_branch(c, output_layers, output_neurons, dropout, regularizer_lambda, x) for c in config['general']['cell_lines']]
 
     mlp_model = Model([i[0] for i in inputs], outputs)
 
@@ -65,22 +66,22 @@ def mlp_model(input_dims, hp):
 
     return mlp_model
 
-def build_branch(n_layers, n_neurons, dropout, prev):
-    x = Dense(n_neurons, activation="relu",  activity_regularizer=l2(0.01))(prev)
+def build_branch(n_layers, n_neurons, dropout, regularizer_lambda, prev):
+    x = Dense(n_neurons, activation="relu",  kernel_regularizer=l2(regularizer_lambda))(prev)
     x = Dropout(dropout)(x)
     for layer in range(n_layers-1):
-        x = Dense(n_neurons, activation="relu",  activity_regularizer=l2(0.01))(x)
+        x = Dense(n_neurons, activation="relu",  kernel_regularizer=l2(regularizer_lambda))(x)
         x = Dropout(dropout)(x)
 
     return x
 
-def build_input_branch(branch_name, input_dim, n_layers, n_neurons, dropout):
+def build_input_branch(branch_name, input_dim, n_layers, n_neurons, dropout, regularizer_lambda):
     input = Input(shape=(input_dim, ), name="input_{}".format(branch_name))
-    x = build_branch(n_layers, n_neurons, dropout, input)
+    x = build_branch(n_layers, n_neurons, dropout, regularizer_lambda, input)
     return input, x
 
-def build_output_branch(branch_name, n_layers, n_neurons, dropout, prev):
-    x = build_branch(n_layers, n_neurons, dropout, prev)
-    pred = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name),  activity_regularizer=l2(0.01))(x)
+def build_output_branch(branch_name, n_layers, n_neurons, dropout, regularizer_lambda, prev):
+    x = build_branch(n_layers, n_neurons, dropout, regularizer_lambda, prev)
+    pred = Dense(1, activation='sigmoid', name="pred_{}".format(branch_name))(x)
 
     return pred
