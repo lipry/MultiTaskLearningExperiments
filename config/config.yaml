@@ -16,10 +16,11 @@ general:
   # both: to be implemented (for sequence and epigenetic features together as input)
   input_type: "epi"
   n_holdouts: 10
+  downsample_balancing: True
   # ["A549", "GM12878", "HEPG2", "K562"]
   # ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
   # ["A549", "HEPG2"]
-  cell_lines: ["A549", "HEPG2"]
+  cell_lines: ["A549", "GM12878", "H1", "HEK293", "HEPG2", "K562" ,"MCF7"]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}, {A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}, {A-E+A-P: 1, BG: 0}]
   # [{A-E: 1, A-P: 0}, {A-P: 1, I-P: 0}]
   # [{A-E: 1, I-E: 0}, {I-E: 1, I-P: 0}]
@@ -57,6 +58,7 @@ multi_layers_perceptron:
   nesterov: True
   kernel_regularizer: False
   regularizer_lambda: 0.01
+  scaling: True
   bayesian_opt:
     max_trials: 25
     num_initial_points: 5
