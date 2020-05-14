@@ -1,5 +1,5 @@
 from src.config.config import config
-from src.data.datasets_helper import filter_labels, split_datasets, calculate_class_weights
+from src.data.datasets_helper import filter_labels, split_datasets, calculate_class_weights, min_max_scaling
 from src.models.models_helper import hp_tuner, model_trainer
 from src.visualizations.ResultsCollector import ResultsCollector
 from src.visualizations.results_export import copy_experiment_configuration, save_dict
@@ -24,6 +24,11 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
 
     copy_experiment_configuration(path_logs)
 
+    # Rescaling input in 0, 1 range
+    if config[exp_name]['scaling']:
+        X = min_max_scaling(X)
+
+
     results = ResultsCollector()
     results.init_eval_metrics()
     for t in tasks_dict:
@@ -31,6 +36,7 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
         logger.debug("NEW EXPERIMENT: {}".format(task_name))
 
         weight_class = calculate_class_weights(y_filtered)
+        #print(weight_class)
 
         results.init_metrics()
         for h in range(holdouts):

@@ -4,13 +4,14 @@ import os
 from functools import partial
 
 from src.config.config import config
+from src.data.datasets_helper import downsample_data
 from src.data.datasets_import import input_data
 from src.experiments.experiments_helper import holdouts_experiments_executor, check_input_type
 from src.experiments.statistics import statistics_executor
 from src.experiments.tsne import tsne_executor
 from src.models.cnn_full_params_sharing_model import cnn_full_params_sharing_model
 from src.models.mlp_model import mlp_model
-
+from collections import Counter
 
 files_path = config['data']['data_path']
 logs_path = config['data']['logs_path']
@@ -37,6 +38,10 @@ logger.debug("Importing data...")
 
 
 X, y = input_data(files_path, input_type=config['general']['input_type'])
+
+if config['general']['downsample_balancing']:
+    X, y = downsample_data(X, y, 20000, balancing_index = 1)
+    logger.debug("NUMBER OF SAMPLES PER LABELS: {}".format([Counter(l) for l in y]))
 
 if exp == "fps":
     check_input_type(['seq'], "Cnn full parameter sharing models work just with sequence data, {} found"

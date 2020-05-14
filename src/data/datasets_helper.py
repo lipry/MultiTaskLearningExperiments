@@ -1,7 +1,9 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import class_weight
 
+from src.config.config import config
 from src.config.config_utils import get_task_labels
 
 
@@ -47,8 +49,8 @@ def filter_labels(X, y, t):
 
 
 def calculate_class_weights(labels):
-    get_weights = lambda y: class_weight.compute_class_weight('balanced', np.unique(y), y)
-    return [get_weights(lab) for lab in labels]
+    get_weights_dict = lambda y: dict(zip(np.unique(y), class_weight.compute_class_weight('balanced', np.unique(y), y)))
+    return {"pred_{}".format(c): get_weights_dict(lab) for c, lab in zip(config['general']['cell_lines'], labels)}
 
 
 def split_datasets(X, y, perc=0.3):
@@ -60,4 +62,36 @@ def split_datasets(X, y, perc=0.3):
     # X_train, y_train, X_test, y_test
     return [x[indices_train] for x in X], [l[indices_train] for l in y], \
            [x[indices_test] for x in X], [l[indices_test] for l in y]
+
+def min_max_scaling(X):
+    scaler = MinMaxScaler((0, 1))
+    return [scaler.fit_transform(x) for x in X]
+
+def downsample_data(X, y, max_size_given, balancing_index = 1):
+    y_balance = y[balancing_index]
+
+    if max_size_given < 0:
+        raise ValueError("max_size_given must be greater than 0")
+    u, indices = np.unique(y_balance, return_inverse=True)
+    num_u = len(u)
+    sample_sizes = np.bincount(indices)
+
+    size_min = np.amin(sample_sizes)
+
+    if size_min < max_size_given:
+        max_size_given = size_min
+    sample_sizes[sample_sizes > max_size_given] = max_size_given
+
+    indices_all = get_indices(indices, sample_sizes, num_u)
+    X = [x[indices_all, :] for x in X]
+    y = [l[indices_all] for l in y]
+
+    return X, y
+
+def get_indices(indices, sample_sizes, n_classes, replace=False):
+    indices_range = np.arange(len(indices))
+    indices_all = np.concatenate([np.random.choice(indices_range[indices == i],
+                                                   size=sample_sizes[i], replace=replace) for i in range(n_classes)])
+
+    return indices_all
 

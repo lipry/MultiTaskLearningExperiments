@@ -30,12 +30,12 @@ def hp_tuner(X_train, y_train, X_val, y_val, model_fun, exp_name, class_weight, 
     return tuner, tuner.get_best_models(num_models=n_best_models), tuner.get_best_hyperparameters(num_trials=n_best_models)
 
 
-def model_trainer(X_train, y_train, X_val, y_val, model_fun, exp_name, class_weight, training_hp):
+def model_trainer(X_train, y_train, X_val, y_val, model_fun, exp_name, class_weights, training_hp):
     #batch_size_total = get_batch_size()
     model = model_fun(training_hp)
     history = model.fit(X_train, y_train,
              epochs=config[exp_name]['epochs'],
-             class_weight=class_weight,
+             class_weight=class_weights,
              batch_size=config[exp_name]['batch_size'],
              validation_data=(X_val, y_val))
 
