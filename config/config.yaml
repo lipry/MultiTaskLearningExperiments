@@ -10,7 +10,7 @@ general:
   # mlp: Multi layer perceptron;
   # stats: to get some statistics about datasets;
   # tsne: to project the data in a 2D space using t-SNE;
-  experiment: "mlp"
+  experiment: "mlp_pyramidal"
   # epi: for epigenetic features as input
   # seq: for sequences as input
   # both: to be implemented (for sequence and epigenetic features together as input)
@@ -60,8 +60,8 @@ multi_layers_perceptron:
   regularizer_lambda: 0.01
   scaling: True
   bayesian_opt:
-    max_trials: 25
-    num_initial_points: 5
+    max_trials: 4
+    num_initial_points: 2
     baseline: 0.2
     patience: 100
     min_delta: 0.001
@@ -74,6 +74,30 @@ multi_layers_perceptron:
       output_layers: [1, 5]
       output_neurons: [2, 4, 8, 16 , 32, 64]
 
+mlp_pyramidal:
+  epochs: 500
+  batch_size: 5000
+  dropout: 0.2
+  decay: 0.01
+  momentum: 0.5
+  nesterov: True
+  kernel_regularizer: False
+  regularizer_lambda: 0.01
+  scaling: True
+  bayesian_opt:
+    max_trials: 100
+    num_initial_points: 15
+    baseline: 0.2
+    patience: 100
+    min_delta: 0.001
+    hyperparameters:
+      learning_rate: [0.1, 0.2]
+      input_layers: [0, 3]
+      input_neurons: [[2, 4, 8, 16, 32, 64, 128, 256], [2, 4, 8, 16, 32, 64, 128], [2, 4, 8, 16, 32, 64]]
+      main_layers: [0, 3]
+      main_neurons: [[2, 4, 8, 16, 32, 64, 128, 256], [2, 4, 8, 16, 32, 64, 128], [2, 4, 8, 16, 32, 64]]
+      output_layers: [0, 3]
+      output_neurons: [[2, 4, 8, 16, 32, 64, 128, 256], [2, 4, 8, 16, 32, 64, 128], [2, 4, 8, 16, 32, 64]]
 
 
 tsne:

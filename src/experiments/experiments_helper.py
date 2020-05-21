@@ -1,5 +1,6 @@
 from src.config.config import config
 from src.data.datasets_helper import filter_labels, split_datasets, calculate_class_weights, min_max_scaling
+from src.models.mlp_pyramid_model import get_combinations_dict
 from src.models.models_helper import hp_tuner, model_trainer
 from src.visualizations.ResultsCollector import ResultsCollector
 from src.visualizations.results_export import copy_experiment_configuration, save_dict
@@ -60,7 +61,16 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
                                                   weight_class,
                                                   1)
 
-            logger.debug("Best hyperparams found: {}".format(hyperparametrs2str(best_hyperparams)))
+            #TODO: refactor this mess
+            logger.debug("Best hyperparams found: ")
+            if exp_name == "mlp_pyramidal":
+                comb_dict = get_combinations_dict()
+                bh = best_hyperparams[0].values
+                for k, v in comb_dict.items():
+                    input_hidden_layer_choice = int(
+                        bh['{}_neurons_comb'.format(k)] * len(v[bh['{}_layers'.format(k)]])/ len(v[-1]))
+                    logger.debug("{}_configurations: {}".format(k, v[bh['{}_layers'.format(k)]][input_hidden_layer_choice]))
+            logger.debug("{}".format(hyperparametrs2str(best_hyperparams)))
 
             # Retraining model with best hyperparameters found
             logger.debug("Training model with best hyperparameters ({}/{} holdout)".format(h + 1, holdouts))
@@ -72,7 +82,9 @@ def holdouts_experiments_executor(exp_name, X, y, logger, path_logs, model_fun, 
                                                 exp_name,
                                                 weight_class,
                                                 best_hyperparams[0])
+            logger.debug("Number of total parameters of the network: {}".format(best_model.count_params()))
             results.add_holdout_results(history)
+
 
             # Evaluating best model performances
             eval_score = best_model.evaluate(X_test if input_type == "epi" else X_test[0],

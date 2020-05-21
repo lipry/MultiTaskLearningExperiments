@@ -13,6 +13,8 @@ from src.models.cnn_full_params_sharing_model import cnn_full_params_sharing_mod
 from src.models.mlp_model import mlp_model
 from collections import Counter
 
+from src.models.mlp_pyramid_model import mlp_pyramid_model, get_hidden_layers_combinations, get_combinations_dict
+
 files_path = config['data']['data_path']
 logs_path = config['data']['logs_path']
 exp = config['general']['experiment']
@@ -54,9 +56,18 @@ if exp == "mlp":
                      .format(config['general']['input_type']))
 
     input_dims = [len(x[0]) for x in X]
-    mlp_model_red = partial(mlp_model, input_dims)
+    mlp_pyramid_model_red = partial(mlp_model, input_dims)
 
-    holdouts_experiments_executor("multi_layers_perceptron", X, y, logger, path_logs, mlp_model_red, "epi")
+    holdouts_experiments_executor("multi_layers_perceptron", X, y, logger, path_logs, mlp_pyramid_model_red, "epi")
+
+if exp == "mlp_pyramidal":
+    check_input_type(['epi'], "Multi Layer Perceptron pyramid model work just with epigenomic data, {} found"
+                     .format(config['general']['input_type']))
+
+    input_dims = [len(x[0]) for x in X]
+    layers_combinations = get_combinations_dict()
+    mlp_pyramid_model_red = partial(mlp_pyramid_model, layers_combinations, input_dims)
+    holdouts_experiments_executor("mlp_pyramidal", X, y, logger, path_logs, mlp_pyramid_model_red, "epi")
 
 if exp == "stats":
     statistics_executor(X, y, logger, path_logs)
